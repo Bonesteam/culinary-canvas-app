@@ -6,11 +6,8 @@ import { Coins, Menu, UtensilsCrossed, X, LogOut, User as UserIcon, LogIn, Shiel
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { useUser, useDoc, useMemoFirebase, useAuth } from '@/firebase';
+import { useMongoDB } from '@/context/MongoDBContext';
 import { Button } from '@/components/ui/button';
-import { doc } from 'firebase/firestore';
-import { useFirestore } from '@/firebase';
-import { signOut } from 'firebase/auth';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useCurrency, type Currency } from '@/context/CurrencyContext';
 
@@ -22,27 +19,18 @@ interface UserProfile {
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
-  const { user, loading: isUserLoading } = useUser();
+  const { user, loading: isUserLoading, logout } = useMongoDB();
   const [isClient, setIsClient] = useState(false);
 
-  const firestore = useFirestore();
-  const auth = useAuth();
   const router = useRouter();
   const { currency, setCurrency } = useCurrency();
-
-  const userDocRef = useMemoFirebase(() => {
-    if (!user) return null;
-    return doc(firestore, 'users', user.uid);
-  }, [firestore, user]);
-
-  const { data: userProfile } = useDoc<UserProfile>(userDocRef);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
   const handleSignOut = async () => {
-    await signOut(auth);
+    logout();
     router.push('/');
   };
 
@@ -50,8 +38,8 @@ export default function Header() {
     setCurrency(value as Currency);
   };
 
-  const tokenBalance = userProfile?.tokenBalance;
-  const isAdmin = userProfile?.role === 'admin';
+  const tokenBalance = user?.tokenBalance;
+  const isAdmin = user?.role === 'admin';
 
   // Show admin link if user is admin
   const allNavLinks = isAdmin
@@ -59,22 +47,21 @@ export default function Header() {
     : NAV_LINKS;
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
-        <Link href="/" className="flex items-center gap-2" onClick={() => setIsOpen(false)}>
+    <header className="header">
+      <div className="header__content">
+        <Link href="/" className="header__logo" onClick={() => setIsOpen(false)}>
           <UtensilsCrossed className="h-6 w-6 text-primary" />
-          <span className="font-headline text-xl font-bold">Culinary Canvas</span>
+          <span className="header__brand">Culinary Canvas</span>
         </Link>
         
-        <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+        <nav className="header__nav">
           {allNavLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className={cn(
-                'transition-colors hover:text-primary',
-                pathname.startsWith(link.href) && link.href !== '/' || pathname === link.href ? 'text-primary' : 'text-muted-foreground'
-              )}
+              className={`header__nav-link ${
+                pathname.startsWith(link.href) && link.href !== '/' || pathname === link.href ? 'header__nav-link--active' : ''
+              }`}
             >
               {link.href === '/admin/requests' ? (
                 <span className="flex items-center gap-1"><Shield size={16}/> {link.label}</span>
@@ -85,7 +72,7 @@ export default function Header() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="header__actions">
            <div className="hidden sm:flex">
              <Tabs value={currency} onValueChange={handleCurrencyChange} className="w-auto">
                 <TabsList>
@@ -95,7 +82,7 @@ export default function Header() {
               </Tabs>
            </div>
           {isUserLoading ? (
-            <div className="h-9 w-24 animate-pulse rounded-full bg-muted"></div>
+            <div className="h-9 w-24 skeleton rounded-full"></div>
           ) : user ? (
             <>
               <div className="hidden sm:flex items-center gap-2 rounded-full border bg-secondary/50 px-3 py-1.5 text-sm font-medium">
@@ -121,7 +108,7 @@ export default function Header() {
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden"
+            className="header__mobile-menu"
             onClick={() => setIsOpen(!isOpen)}
           >
             {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -131,18 +118,17 @@ export default function Header() {
       </div>
 
       {isOpen && (
-        <div className="md:hidden">
-          <div className="container flex flex-col items-start gap-4 pb-4">
-            <nav className="flex flex-col items-start gap-2 w-full">
+        <div className={`header__mobile-nav ${isOpen ? 'header__mobile-nav--open' : ''}`}>
+          <div className="header__mobile-nav-content">
+            <nav className="header__mobile-nav-links">
               {allNavLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
                   onClick={() => setIsOpen(false)}
-                  className={cn(
-                    'w-full rounded-md px-3 py-2 text-base font-medium transition-colors hover:bg-accent hover:text-accent-foreground',
-                     pathname.startsWith(link.href) && link.href !== '/' || pathname === link.href ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'
-                  )}
+                  className={`header__mobile-nav-link ${
+                    pathname.startsWith(link.href) && link.href !== '/' || pathname === link.href ? 'header__mobile-nav-link--active' : ''
+                  }`}
                 >
                    {link.href === '/admin/requests' ? (
                     <span className="flex items-center gap-2"><Shield size={16}/> {link.label}</span>

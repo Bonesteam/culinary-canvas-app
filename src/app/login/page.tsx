@@ -15,8 +15,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
-import { useAuth } from '@/firebase';
-import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { useMongoDB } from '@/context/MongoDBContext';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { Chrome } from 'lucide-react';
@@ -27,7 +26,7 @@ const formSchema = z.object({
 });
 
 export default function LoginPage() {
-  const auth = useAuth();
+  const { login } = useMongoDB();
   const router = useRouter();
   const { toast } = useToast();
 
@@ -41,7 +40,18 @@ export default function LoginPage() {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      await signInWithEmailAndPassword(auth, values.email, values.password);
+      // For demo purposes, create a mock user
+      const mockUser = {
+        uid: 'demo-user-' + Date.now(),
+        displayName: values.email.split('@')[0],
+        email: values.email,
+        photoURL: null,
+        tokenBalance: 2000,
+        role: undefined,
+        createdAt: new Date()
+      };
+      
+      login(mockUser);
       router.push('/dashboard');
     } catch (error: any) {
       toast({
@@ -53,9 +63,19 @@ export default function LoginPage() {
   };
 
   const handleGoogleSignIn = async () => {
-    const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
+      // For demo purposes, create a mock user
+      const mockUser = {
+        uid: 'google-user-' + Date.now(),
+        displayName: 'Google User',
+        email: 'user@gmail.com',
+        photoURL: 'https://via.placeholder.com/150',
+        tokenBalance: 2000,
+        role: undefined,
+        createdAt: new Date()
+      };
+      
+      login(mockUser);
       router.push('/dashboard');
     } catch (error: any) {
       toast({

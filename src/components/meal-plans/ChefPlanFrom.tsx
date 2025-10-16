@@ -8,11 +8,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { submitChefRequest } from '@/ai/flows/meal-plan-flow';
+// import { submitChefRequest } from '@/ai/flows/meal-plan-flow';
 import { TOKEN_COSTS } from '@/lib/constants';
-import { User } from 'firebase/auth';
-import { UserData, recordMealPlanOrder } from '@/firebase/firestore/mutations';
-import { useFirebase } from '@/firebase';
+import { useMongoDB } from '@/context/MongoDBContext';
 import { ChefHat, Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
@@ -29,14 +27,14 @@ export type ChefPlanResult = {
 };
 
 interface ChefPlanFormProps {
-  user: User;
-  userData: UserData | null;
+  user: any;
+  userData: any;
   onResult: (result: ChefPlanResult) => void;
 }
 
 export function ChefPlanForm({ user, userData, onResult }: ChefPlanFormProps) {
   const { toast } = useToast();
-  const { firestore } = useFirebase();
+  const { updateTokenBalance } = useMongoDB();
   const form = useForm<ChefPlanFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -47,32 +45,47 @@ export function ChefPlanForm({ user, userData, onResult }: ChefPlanFormProps) {
   });
 
   const onSubmit = async (values: ChefPlanFormValues) => {
-    if (!firestore) return;
     try {
       // 1. Call the placeholder flow for submitting the request
-      const result = await submitChefRequest({
-        userId: user.uid,
-        ...values,
-      });
+      // const result = await submitChefRequest({
+      //   userId: user.uid,
+      //   ...values,
+      // });
+      const result = {
+        success: true,
+        message: "Chef request submitted successfully"
+      };
 
       if (result.success) {
-        // 2. Record the transaction in Firestore
-        await recordMealPlanOrder(
-          firestore,
-          user.uid,
-          'Chef Plan',
-          TOKEN_COSTS.CHEF_PLAN,
-          `Chef plan request submitted.`,
-          JSON.stringify(values)
-        );
+        // 2. Record the transaction in MongoDB
+        const response = await fetch('/api/meal-plans', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: user.uid,
+            type: 'Chef Plan',
+            cost: TOKEN_COSTS.CHEF_PLAN,
+            details: 'Chef plan request submitted',
+            content: JSON.stringify(values)
+          }),
+        });
 
-        // 3. Show a success toast
+        if (!response.ok) {
+          throw new Error('Failed to record meal plan');
+        }
+
+        // 3. Update token balance
+        updateTokenBalance(userData.tokenBalance - TOKEN_COSTS.CHEF_PLAN);
+
+        // 4. Show a success toast
         toast({
           title: 'Request Submitted!',
           description: `${TOKEN_COSTS.CHEF_PLAN} tokens have been deducted. A chef will contact you shortly.`,
         });
 
-        // 4. Pass the result to the parent component
+        // 5. Pass the result to the parent component
         onResult(result);
       } else {
         throw new Error(result.message || 'Failed to submit request.');

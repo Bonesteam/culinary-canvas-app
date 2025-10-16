@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  useFirestore,
-  useUser,
-  useCollection,
-  useMemoFirebase,
-  useDoc,
-} from '@/firebase';
+import { useMongoDB } from '@/context/MongoDBContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import {
   Table,
@@ -27,46 +21,35 @@ import { Button } from '@/components/ui/button';
 import { Coins, History, ShoppingCart, Eye, Download, User as UserIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
-import { collection, doc, query, where, orderBy } from 'firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import jsPDF from 'jspdf';
-
+import { useState, useEffect } from 'react';
 
 export default function DashboardPage() {
-  const { user, loading: isUserLoading } = useUser();
-  const firestore = useFirestore();
+  const { user, loading: isUserLoading } = useMongoDB();
+  const [orders, setOrders] = useState([]);
+  const [purchases, setPurchases] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const userDocRef = useMemoFirebase(
-    () => (user ? doc(firestore, 'users', user.uid) : null),
-    [firestore, user]
-  );
-  const { data: userProfile, isLoading: isProfileLoading } =
-    useDoc<{ tokenBalance: number, displayName: string, email: string, photoURL: string }>(userDocRef);
+  useEffect(() => {
+    if (user) {
+      // Fetch meal plans
+      fetch(`/api/meal-plans?userId=${user.uid}`)
+        .then(res => res.json())
+        .then(data => setOrders(data.mealPlans || []))
+        .catch(console.error);
 
-  const mealPlansQuery = useMemoFirebase(
-    () =>
-      user
-        ? query(collection(firestore, 'mealPlans'), where('userId', '==', user.uid), orderBy('creationDate', 'desc'))
-        : null,
-    [firestore, user]
-  );
-  const { data: orders, isLoading: areOrdersLoading } =
-    useCollection(mealPlansQuery);
+      // Fetch transactions
+      fetch(`/api/transactions?userId=${user.uid}`)
+        .then(res => res.json())
+        .then(data => setPurchases(data.transactions || []))
+        .catch(console.error);
+    }
+    setIsLoading(false);
+  }, [user]);
 
-  const transactionsQuery = useMemoFirebase(
-    () =>
-      user
-        ? query(collection(firestore, 'transactions'), where('userId', '==', user.uid), where('type', '==', 'Purchase'), orderBy('date', 'desc'))
-        : null,
-    [firestore, user]
-  );
-  const { data: purchases, isLoading: arePurchasesLoading } =
-    useCollection(transactionsQuery);
-
-  const isLoading = isUserLoading || isProfileLoading || areOrdersLoading || arePurchasesLoading;
-
-  if (isLoading) {
+  if (isUserLoading || isLoading) {
     return <DashboardSkeleton />;
   }
 
@@ -97,7 +80,6 @@ export default function DashboardPage() {
     return name.substring(0, 2);
   };
 
-
   return (
     <div className="container py-8 md:py-12">
       <header className="mb-8">
@@ -115,12 +97,12 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent className="flex items-center gap-4">
              <Avatar className="h-16 w-16">
-                <AvatarImage src={userProfile?.photoURL} alt={userProfile?.displayName} />
-                <AvatarFallback>{userProfile?.displayName ? getInitials(userProfile.displayName) : '..'}</AvatarFallback>
+                <AvatarImage src={user?.photoURL} alt={user?.displayName} />
+                <AvatarFallback>{user?.displayName ? getInitials(user.displayName) : '..'}</AvatarFallback>
             </Avatar>
             <div className="truncate">
-                <p className="text-lg font-semibold truncate">{userProfile?.displayName}</p>
-                <p className="text-sm text-muted-foreground truncate">{userProfile?.email}</p>
+                <p className="text-lg font-semibold truncate">{user?.displayName}</p>
+                <p className="text-sm text-muted-foreground truncate">{user?.email}</p>
             </div>
           </CardContent>
         </Card>
@@ -131,7 +113,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {userProfile?.tokenBalance?.toLocaleString() ?? 0} Tokens
+              {user?.tokenBalance?.toLocaleString() ?? 0} Tokens
             </div>
             <p className="text-xs text-muted-foreground">
               Ready to spend on your next meal plan.
@@ -162,7 +144,7 @@ export default function DashboardPage() {
               <TableBody>
                 {orders && orders.length > 0 ? (
                   orders.map((order: any) => (
-                    <TableRow key={order.id}>
+                    <TableRow key={order._id}>
                       <TableCell>
                         <Badge
                           variant={order.type === 'AI Plan' ? 'secondary' : 'default'}
@@ -171,7 +153,7 @@ export default function DashboardPage() {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        {format(order.creationDate.toDate(), 'MMM d, yyyy')}
+                        {format(new Date(order.creationDate), 'MMM d, yyyy')}
                       </TableCell>
                       <TableCell className="text-right font-medium">
                         {order.cost} Tokens
@@ -185,7 +167,7 @@ export default function DashboardPage() {
                           </DialogTrigger>
                           <DialogContent className="max-w-2xl">
                             <DialogHeader>
-                              <DialogTitle>{order.type} - {format(order.creationDate.toDate(), 'PP')}</DialogTitle>
+                              <DialogTitle>{order.type} - {format(new Date(order.creationDate), 'PP')}</DialogTitle>
                             </DialogHeader>
                             <div className="prose prose-sm max-w-none whitespace-pre-wrap max-h-[60vh] overflow-y-auto rounded-md border bg-muted/50 p-4">
                               {order.content}
@@ -197,7 +179,7 @@ export default function DashboardPage() {
                               variant="ghost" 
                               size="icon" 
                               title="Download PDF" 
-                              onClick={() => handleDownloadPdf(order.content, order.type, format(order.creationDate.toDate(), 'yyyy-MM-dd'))}
+                              onClick={() => handleDownloadPdf(order.content, order.type, format(new Date(order.creationDate), 'yyyy-MM-dd'))}
                             >
                                 <Download className="h-4 w-4" />
                             </Button>
@@ -241,9 +223,9 @@ export default function DashboardPage() {
               <TableBody>
                 {purchases && purchases.length > 0 ? (
                   purchases.map((purchase: any) => (
-                    <TableRow key={purchase.id}>
+                    <TableRow key={purchase._id}>
                       <TableCell>
-                        {format(purchase.date.toDate(), 'MMM d, yyyy')}
+                        {format(new Date(purchase.date), 'MMM d, yyyy')}
                       </TableCell>
                       <TableCell className="max-w-[150px] truncate">
                         {purchase.details}
@@ -392,4 +374,3 @@ function DashboardSkeleton() {
       </div>
     );
   }
-    

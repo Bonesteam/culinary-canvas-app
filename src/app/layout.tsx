@@ -3,7 +3,7 @@ import './globals.css';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { Toaster } from "@/components/ui/toaster";
-import { FirebaseClientProvider } from '@/firebase/client-provider';
+import { MongoDBProvider } from '@/context/MongoDBContext';
 import { CurrencyProvider } from '@/context/CurrencyContext';
 
 export const metadata: Metadata = {
@@ -25,14 +25,14 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <CurrencyProvider>
-          <FirebaseClientProvider>
-            <div className="flex min-h-screen flex-col">
+          <MongoDBProvider>
+            <div className="flex h-min-screen flex-col">
               <Header />
-              <main className="flex-1">{children}</main>
+              <main className="main">{children}</main>
               <Footer />
             </div>
             <Toaster />
-          </FirebaseClientProvider>
+          </MongoDBProvider>
         </CurrencyProvider>
       </body>
     </html>

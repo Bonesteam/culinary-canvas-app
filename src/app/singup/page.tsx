@@ -15,11 +15,9 @@ import {
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
-import { useAuth, useFirestore } from '@/firebase';
-import { createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup, User } from 'firebase/auth';
+import { useMongoDB } from '@/context/MongoDBContext';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { Chrome } from 'lucide-react';
 
 const formSchema = z.object({
@@ -29,8 +27,7 @@ const formSchema = z.object({
 });
 
 export default function SignUpPage() {
-  const auth = useAuth();
-  const firestore = useFirestore();
+  const { login } = useMongoDB();
   const router = useRouter();
   const { toast } = useToast();
 
@@ -43,35 +40,20 @@ export default function SignUpPage() {
     },
   });
 
-  // This function creates the user profile document in Firestore.
-  // It now checks if the document already exists to avoid overwriting data on re-login.
-  const createUserProfile = async (user: User) => {
-    const userDocRef = doc(firestore, 'users', user.uid);
-    const userDoc = await getDoc(userDocRef);
-
-    // Only create a new document if one doesn't already exist
-    if (!userDoc.exists()) {
-      const profileData = {
-        uid: user.uid,
-        email: user.email,
-        displayName: user.displayName,
-        photoURL: user.photoURL,
-        tokenBalance: 2000, // Initial token balance for new users
-        // Special check for the first admin user
-        role: user.email === 'mfaraone80@gmail.com' ? 'admin' : 'user',
-      };
-      await setDoc(userDocRef, profileData);
-    }
-  };
-
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
-      const user = userCredential.user;
-      await updateProfile(user, { displayName: values.displayName });
-      // We need to reload the user to get the updated displayName
-      await user.reload(); 
-      await createUserProfile(user);
+      // For demo purposes, create a mock user
+      const mockUser = {
+        uid: 'user-' + Date.now(),
+        displayName: values.displayName,
+        email: values.email,
+        photoURL: null,
+        tokenBalance: 2000,
+        role: values.email === 'mfaraone80@gmail.com' ? 'admin' : undefined,
+        createdAt: new Date()
+      };
+      
+      login(mockUser);
       router.push('/dashboard');
     } catch (error: any) {
       toast({
@@ -83,11 +65,19 @@ export default function SignUpPage() {
   };
   
   const handleGoogleSignIn = async () => {
-    const provider = new GoogleAuthProvider();
     try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      await createUserProfile(user); // The function now handles both new and existing users
+      // For demo purposes, create a mock user
+      const mockUser = {
+        uid: 'google-user-' + Date.now(),
+        displayName: 'Google User',
+        email: 'user@gmail.com',
+        photoURL: 'https://via.placeholder.com/150',
+        tokenBalance: 2000,
+        role: undefined,
+        createdAt: new Date()
+      };
+      
+      login(mockUser);
       router.push('/dashboard');
     } catch (error: any) {
       toast({

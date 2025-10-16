@@ -1,8 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
-import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -26,31 +24,46 @@ interface MealPlanRequest {
 
 export default function RequestDetailPage() {
   const { id } = useParams();
-  const firestore = useFirestore();
   const router = useRouter();
   const { toast } = useToast();
   
   const [responseContent, setResponseContent] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [request, setRequest] = useState<MealPlanRequest | null>(null);
+  const [isRequestLoading, setIsRequestLoading] = useState(true);
 
-  const requestDocRef = useMemoFirebase(
-    () => (id ? doc(firestore, 'mealPlans', id as string) : null),
-    [firestore, id]
-  );
-
-  const { data: request, isLoading: isRequestLoading } = useDoc<MealPlanRequest>(requestDocRef);
+  useEffect(() => {
+    if (id) {
+      fetch(`/api/meal-plans/${id}`)
+        .then(res => res.json())
+        .then(data => setRequest(data.mealPlan))
+        .catch(console.error)
+        .finally(() => setIsRequestLoading(false));
+    }
+  }, [id]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!responseContent || !requestDocRef) return;
+    if (!responseContent || !id) return;
 
     setIsLoading(true);
     try {
-      await updateDoc(requestDocRef, {
-        content: responseContent,
-        status: 'completed',
-        completionDate: serverTimestamp(),
+      const response = await fetch(`/api/meal-plans/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          content: responseContent,
+          status: 'completed',
+          completedAt: new Date().toISOString()
+        }),
       });
+
+      if (!response.ok) {
+        throw new Error('Failed to update meal plan');
+      }
+
       toast({
         title: 'Plan Sent!',
         description: 'The user has been notified and can view their new meal plan.',
@@ -92,7 +105,7 @@ export default function RequestDetailPage() {
     <div className="container py-8 md:py-12">
       <PageHeader
         title={`Request from ${request.userId.substring(0, 8)}...`}
-        description={`Submitted on: ${request.creationDate.toDate().toLocaleDateString()}`}
+        description={`Submitted on: ${new Date(request.creationDate).toLocaleDateString()}`}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

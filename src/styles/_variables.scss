@@ -1,0 +1,103 @@
+// Color variables
+:root {
+  // Light theme colors
+  --background: 45 71% 93%;
+  --foreground: 24 10% 10%;
+  --card: 45 71% 93%;
+  --card-foreground: 24 10% 10%;
+  --popover: 45 71% 93%;
+  --popover-foreground: 24 10% 10%;
+  --primary: 39 100% 39%;
+  --primary-foreground: 45 71% 93%;
+  --secondary: 45 20% 85%;
+  --secondary-foreground: 24 10% 10%;
+  --muted: 45 20% 85%;
+  --muted-foreground: 24 5% 45%;
+  --accent: 30 49% 64%;
+  --accent-foreground: 24 10% 10%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 45 20% 80%;
+  --input: 45 20% 80%;
+  --ring: 39 100% 39%;
+  --chart-1: 12 76% 61%;
+  --chart-2: 173 58% 39%;
+  --chart-3: 197 37% 24%;
+  --chart-4: 43 74% 66%;
+  --chart-5: 27 87% 67%;
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: 24 10% 10%;
+  --foreground: 45 71% 93%;
+  --card: 24 10% 10%;
+  --card-foreground: 45 71% 93%;
+  --popover: 24 10% 10%;
+  --popover-foreground: 45 71% 93%;
+  --primary: 39 100% 39%;
+  --primary-foreground: 45 71% 93%;
+  --secondary: 24 5% 20%;
+  --secondary-foreground: 45 71% 93%;
+  --muted: 24 5% 20%;
+  --muted-foreground: 45 5% 65%;
+  --accent: 30 49% 64%;
+  --accent-foreground: 24 10% 10%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 24 5% 25%;
+  --input: 24 5% 25%;
+  --ring: 39 100% 39%;
+  --chart-1: 220 70% 50%;
+  --chart-2: 160 60% 45%;
+  --chart-3: 30 80% 55%;
+  --chart-4: 280 65% 60%;
+  --chart-5: 340 75% 55%;
+}
+
+// SCSS variables
+$primary-color: hsl(var(--primary));
+$primary-foreground: hsl(var(--primary-foreground));
+$secondary-color: hsl(var(--secondary));
+$secondary-foreground: hsl(var(--secondary-foreground));
+$background-color: hsl(var(--background));
+$foreground-color: hsl(var(--foreground));
+$muted-color: hsl(var(--muted));
+$muted-foreground: hsl(var(--muted-foreground));
+$accent-color: hsl(var(--accent));
+$accent-foreground: hsl(var(--accent-foreground));
+$destructive-color: hsl(var(--destructive));
+$destructive-foreground: hsl(var(--destructive-foreground));
+$border-color: hsl(var(--border));
+$input-color: hsl(var(--input));
+$ring-color: hsl(var(--ring));
+
+// Typography
+$font-body: 'PT Sans', sans-serif;
+$font-headline: 'Playfair Display', serif;
+$font-code: monospace;
+
+// Spacing
+$spacing-xs: 0.25rem;
+$spacing-sm: 0.5rem;
+$spacing-md: 1rem;
+$spacing-lg: 1.5rem;
+$spacing-xl: 2rem;
+$spacing-2xl: 3rem;
+$spacing-3xl: 4rem;
+
+// Border radius
+$radius-sm: calc(var(--radius) - 4px);
+$radius-md: calc(var(--radius) - 2px);
+$radius-lg: var(--radius);
+
+// Breakpoints
+$breakpoint-sm: 640px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1280px;
+$breakpoint-2xl: 1400px;
+
+// Container
+$container-padding: 2rem;
+$container-max-width: 1400px;

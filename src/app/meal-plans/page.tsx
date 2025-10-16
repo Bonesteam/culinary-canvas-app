@@ -1,15 +1,17 @@
+'use client';
+
 import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChefHat, Sparkles } from 'lucide-react';
 import { AIPlanForm } from '@/components/meal-plans/AIPlanFrom';
 import { ChefPlanForm } from '@/components/meal-plans/ChefPlanFrom';
-import { useUser } from '@/firebase/auth/use-user';
+import { useMongoDB } from '@/context/MongoDBContext';
 import { placeholderImages } from '@/lib/placeholder-images';
 
 export default function MealPlansPage() {
   const chefImage = placeholderImages.find(p => p.id === 'chef-plan');
   const aiImage = placeholderImages.find(p => p.id === 'ai-plan');
-  const { user, userData, loading } = useUser();
+  const { user, loading } = useMongoDB();
 
   // Optionally, you can show a loading state here
   if (loading) {
@@ -52,7 +54,7 @@ export default function MealPlansPage() {
           </CardHeader>
           <CardContent>
             {user ? (
-              <AIPlanForm user={user} userData={userData} onResult={handleResult} />
+              <AIPlanForm user={user} userData={user} onResult={handleResult} />
             ) : (
               <div className="text-center text-muted-foreground">Please log in to use the AI meal plan.</div>
             )}
@@ -82,7 +84,7 @@ export default function MealPlansPage() {
           </CardHeader>
           <CardContent>
             {user ? (
-              <ChefPlanForm user={user} userData={userData} onResult={handleResult} />
+              <ChefPlanForm user={user} userData={user} onResult={handleResult} />
             ) : (
               <div className="text-center text-muted-foreground">Please log in to request a chef plan.</div>
             )}
