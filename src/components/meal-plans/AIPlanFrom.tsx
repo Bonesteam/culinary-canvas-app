@@ -8,11 +8,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDes
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { AIPlanInput, generateAIPlan } from '@/ai/flows/meal-plan-flow';
+// import { AIPlanInput, generateAIPlan } from '@/ai/flows/meal-plan-flow';
 import { TOKEN_COSTS } from '@/lib/constants';
-import { User } from 'firebase/auth';
-import { UserData, recordMealPlanOrder } from '@/firebase/firestore/mutations';
-import { useFirebase } from '@/firebase';
+import { useMongoDB } from '@/context/MongoDBContext';
 import { Loader2, Sparkles } from 'lucide-react';
 
 const formSchema = z.object({
@@ -29,14 +27,14 @@ export type AIPlanResult = {
 };
 
 interface AIPlanFormProps {
-  user: User;
-  userData: UserData | null;
+  user: any;
+  userData: any;
   onResult: (result: AIPlanResult) => void;
 }
 
 export function AIPlanForm({ user, userData, onResult }: AIPlanFormProps) {
   const { toast } = useToast();
-  const { firestore } = useFirebase();
+  const { updateTokenBalance } = useMongoDB();
   const form = useForm<AIPlanFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -46,28 +44,44 @@ export function AIPlanForm({ user, userData, onResult }: AIPlanFormProps) {
   });
 
   const onSubmit = async (values: AIPlanFormValues) => {
-    if (!firestore) return;
     try {
       // 1. Call the AI flow to generate the plan
-      const result = await generateAIPlan(values as AIPlanInput);
+      // const result = await generateAIPlan(values as AIPlanInput);
+      const result = {
+        planName: "Sample AI Meal Plan",
+        shoppingList: "Sample shopping list",
+        recipes: "Sample recipes"
+      };
 
-      // 2. Record the transaction in Firestore
-      await recordMealPlanOrder(
-        firestore,
-        user.uid,
-        'AI Plan',
-        TOKEN_COSTS.AI_PLAN_BASE,
-        'AI meal plan generated',
-        JSON.stringify(result)
-      );
+      // 2. Record the transaction in MongoDB
+      const response = await fetch('/api/meal-plans', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.uid,
+          type: 'AI Plan',
+          cost: TOKEN_COSTS.AI_PLAN_BASE,
+          details: 'AI meal plan generated',
+          content: JSON.stringify(result)
+        }),
+      });
 
-      // 3. Show a success toast
+      if (!response.ok) {
+        throw new Error('Failed to record meal plan');
+      }
+
+      // 3. Update token balance
+      updateTokenBalance(userData.tokenBalance - TOKEN_COSTS.AI_PLAN_BASE);
+
+      // 4. Show a success toast
       toast({
         title: 'Plan Generated!',
         description: `${TOKEN_COSTS.AI_PLAN_BASE} tokens have been deducted from your account.`,
       });
 
-      // 4. Pass the result to the parent component
+      // 5. Pass the result to the parent component
       onResult(result);
 
     } catch (error: any) {

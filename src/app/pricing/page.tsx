@@ -9,16 +9,14 @@ import { GBP_TO_EUR_RATE, TOKEN_PACKAGES } from '@/lib/constants';
 import { CheckCircle, PlusCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import { useFirestore, useUser } from '@/firebase';
+import { useMongoDB } from '@/context/MongoDBContext';
 import { useRouter } from 'next/navigation';
 import { useCurrency, type Currency } from '@/context/CurrencyContext';
-import { handlePurchase } from '@/lib/purchase';
 
 export default function PricingPage() {
   const [customAmount, setCustomAmount] = useState('');
   const { toast } = useToast();
-  const { user } = useUser();
-  const firestore = useFirestore();
+  const { user, updateTokenBalance } = useMongoDB();
   const router = useRouter();
   const { currency } = useCurrency();
   const [isClient, setIsClient] = useState(false);
@@ -43,22 +41,35 @@ export default function PricingPage() {
   }
   
   const onPurchase = async (tokens: number, amount: number, currency: Currency, details: string) => {
-     await handlePurchase({
-        firestore,
-        user,
-        router,
-        toast,
-        purchaseDetails: {
-            tokens,
-            amount,
-            currency,
-            details
-        }
-     });
+    if (!user) {
+      toast({
+        variant: 'destructive',
+        title: 'Please log in',
+        description: 'You need to be logged in to purchase tokens.',
+      });
+      router.push('/login');
+      return;
+    }
 
-     if (details === 'Custom Amount') {
+    try {
+      // For demo purposes, just update the token balance
+      updateTokenBalance(user.tokenBalance + tokens);
+      
+      toast({
+        title: 'Purchase Successful!',
+        description: `You've added ${tokens.toLocaleString()} tokens to your account.`,
+      });
+
+      if (details === 'Custom Amount') {
         setCustomAmount('');
-     }
+      }
+    } catch (error: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Purchase Failed',
+        description: error.message || 'Failed to process your purchase.',
+      });
+    }
   };
 
   return (

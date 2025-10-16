@@ -1,0 +1,460 @@
+// Component styles
+
+// Button variants
+.btn {
+  @include button-base;
+  
+  &--default {
+    background-color: $primary-color;
+    color: $primary-foreground;
+    
+    &:hover {
+      background-color: hsl(var(--primary) / 0.9);
+    }
+  }
+  
+  &--secondary {
+    background-color: $secondary-color;
+    color: $secondary-foreground;
+    
+    &:hover {
+      background-color: hsl(var(--secondary) / 0.8);
+    }
+  }
+  
+  &--ghost {
+    background-color: transparent;
+    color: $foreground-color;
+    
+    &:hover {
+      background-color: $accent-color;
+      color: $accent-foreground;
+    }
+  }
+  
+  &--destructive {
+    background-color: $destructive-color;
+    color: $destructive-foreground;
+    
+    &:hover {
+      background-color: hsl(var(--destructive) / 0.9);
+    }
+  }
+  
+  &--outline {
+    border: 1px solid $border-color;
+    background-color: transparent;
+    color: $foreground-color;
+    
+    &:hover {
+      background-color: $accent-color;
+      color: $accent-foreground;
+    }
+  }
+  
+  &--link {
+    background-color: transparent;
+    color: $primary-color;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    
+    &:hover {
+      text-decoration: none;
+    }
+  }
+  
+  // Button sizes
+  &--sm {
+    height: 2rem;
+    padding: 0 $spacing-sm;
+    font-size: 0.75rem;
+  }
+  
+  &--md {
+    height: 2.5rem;
+    padding: 0 $spacing-md;
+    font-size: 0.875rem;
+  }
+  
+  &--lg {
+    height: 3rem;
+    padding: 0 $spacing-lg;
+    font-size: 1rem;
+  }
+  
+  &--icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+  }
+}
+
+// Card component
+.card {
+  @include card;
+  padding: $spacing-lg;
+  
+  &__header {
+    display: flex;
+    flex-direction: column;
+    space-y: 1.5rem;
+    padding-bottom: $spacing-lg;
+  }
+  
+  &__title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.025em;
+  }
+  
+  &__description {
+    font-size: 0.875rem;
+    color: $muted-foreground;
+  }
+  
+  &__content {
+    padding-top: $spacing-lg;
+  }
+  
+  &__footer {
+    display: flex;
+    align-items: center;
+    padding-top: $spacing-lg;
+  }
+}
+
+// Input component
+.input {
+  @include input-base;
+}
+
+// Label component
+.label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: $foreground-color;
+  margin-bottom: $spacing-xs;
+  display: block;
+}
+
+// Textarea component
+.textarea {
+  @include input-base;
+  min-height: 5rem;
+  padding: $spacing-sm $spacing-md;
+  resize: vertical;
+}
+
+// Select component
+.select {
+  @include input-base;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+  appearance: none;
+}
+
+// Checkbox component
+.checkbox {
+  width: 1rem;
+  height: 1rem;
+  border: 1px solid $border-color;
+  border-radius: $radius-sm;
+  background-color: hsl(var(--background));
+  cursor: pointer;
+  
+  &:checked {
+    background-color: $primary-color;
+    border-color: $primary-color;
+  }
+  
+  &:focus {
+    outline: 2px solid $ring-color;
+    outline-offset: 2px;
+  }
+}
+
+// Radio component
+.radio {
+  width: 1rem;
+  height: 1rem;
+  border: 1px solid $border-color;
+  border-radius: 50%;
+  background-color: hsl(var(--background));
+  cursor: pointer;
+  
+  &:checked {
+    background-color: $primary-color;
+    border-color: $primary-color;
+  }
+  
+  &:focus {
+    outline: 2px solid $ring-color;
+    outline-offset: 2px;
+  }
+}
+
+// Switch component
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 2.75rem;
+  height: 1.5rem;
+  
+  &__input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  &__slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: $muted-color;
+    transition: 0.2s;
+    border-radius: 1.5rem;
+    
+    &:before {
+      position: absolute;
+      content: "";
+      height: 1.25rem;
+      width: 1.25rem;
+      left: 0.125rem;
+      bottom: 0.125rem;
+      background-color: white;
+      transition: 0.2s;
+      border-radius: 50%;
+    }
+  }
+  
+  &__input:checked + &__slider {
+    background-color: $primary-color;
+  }
+  
+  &__input:checked + &__slider:before {
+    transform: translateX(1.25rem);
+  }
+}
+
+// Badge component
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  transition: colors 0.2s ease-in-out;
+  
+  &--default {
+    background-color: $primary-color;
+    color: $primary-foreground;
+  }
+  
+  &--secondary {
+    background-color: $secondary-color;
+    color: $secondary-foreground;
+  }
+  
+  &--destructive {
+    background-color: $destructive-color;
+    color: $destructive-foreground;
+  }
+  
+  &--outline {
+    border: 1px solid $border-color;
+    background-color: transparent;
+    color: $foreground-color;
+  }
+}
+
+// Alert component
+.alert {
+  position: relative;
+  width: 100%;
+  border-radius: $radius-lg;
+  border: 1px solid $border-color;
+  padding: $spacing-md;
+  
+  &--default {
+    background-color: hsl(var(--background));
+    color: $foreground-color;
+  }
+  
+  &--destructive {
+    background-color: hsl(var(--destructive) / 0.1);
+    color: $destructive-color;
+    border-color: hsl(var(--destructive) / 0.2);
+  }
+}
+
+// Progress component
+.progress {
+  position: relative;
+  height: 1rem;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 9999px;
+  background-color: $muted-color;
+  
+  &__indicator {
+    height: 100%;
+    width: 100%;
+    background-color: $primary-color;
+    transition: transform 0.2s ease-in-out;
+    transform-origin: left;
+  }
+}
+
+// Skeleton component
+.skeleton {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  background-color: $muted-color;
+  border-radius: $radius-md;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+// Accordion component
+.accordion {
+  border-radius: $radius-lg;
+  border: 1px solid $border-color;
+  
+  &__item {
+    border-bottom: 1px solid $border-color;
+    
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+  
+  &__trigger {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+    padding: $spacing-md;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    
+    &:hover {
+      background-color: $muted-color;
+    }
+    
+    &[data-state="open"] {
+      background-color: $muted-color;
+    }
+  }
+  
+  &__content {
+    overflow: hidden;
+    font-size: 0.875rem;
+    color: $muted-foreground;
+    padding: 0 $spacing-md $spacing-md;
+    
+    &[data-state="open"] {
+      animation: accordion-down 0.2s ease-out;
+    }
+    
+    &[data-state="closed"] {
+      animation: accordion-up 0.2s ease-out;
+    }
+  }
+}
+
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+// Tabs component
+.tabs {
+  &__list {
+    display: inline-flex;
+    height: 2.5rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: $radius-md;
+    background-color: $muted-color;
+    padding: 0.25rem;
+  }
+  
+  &__trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    border-radius: calc($radius-md - 2px);
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: $muted-foreground;
+    
+    &:hover {
+      color: $foreground-color;
+    }
+    
+    &[data-state="active"] {
+      background-color: $background-color;
+      color: $foreground-color;
+      box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    }
+  }
+  
+  &__content {
+    margin-top: $spacing-md;
+    
+    &[data-state="active"] {
+      animation: fadeIn 0.2s ease-in-out;
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

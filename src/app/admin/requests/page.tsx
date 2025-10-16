@@ -1,7 +1,7 @@
 'use client';
 
-import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-import { collection, query, orderBy } from 'firebase/firestore';
+import { useMongoDB } from '@/context/MongoDBContext';
+import { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/shared/PageHeader';
 import {
   Table,
@@ -19,14 +19,19 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
 
 export default function AdminRequestsPage() {
-  const firestore = useFirestore();
+  const { user } = useMongoDB();
+  const [requests, setRequests] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const requestsQuery = useMemoFirebase(
-    () => query(collection(firestore, 'mealPlans'), orderBy('creationDate', 'desc')),
-    [firestore]
-  );
-
-  const { data: requests, isLoading } = useCollection(requestsQuery);
+  useEffect(() => {
+    if (user) {
+      fetch('/api/meal-plans?admin=true')
+        .then(res => res.json())
+        .then(data => setRequests(data.mealPlans || []))
+        .catch(console.error)
+        .finally(() => setIsLoading(false));
+    }
+  }, [user]);
 
   return (
     <div className="container py-8 md:py-12">
@@ -59,9 +64,9 @@ export default function AdminRequestsPage() {
               )}
               {requests && requests.length > 0 ? (
                 requests.map((request: any) => (
-                  <TableRow key={request.id}>
+                  <TableRow key={request._id}>
                     <TableCell>
-                      {request.creationDate.toDate().toLocaleDateString()}
+                      {new Date(request.creationDate).toLocaleDateString()}
                     </TableCell>
                     <TableCell className="font-mono text-xs">{request.userId}</TableCell>
                     <TableCell>
@@ -77,7 +82,7 @@ export default function AdminRequestsPage() {
                     <TableCell className="text-right">
                        {request.type === 'Chef Plan' && (
                          <Button asChild variant="ghost" size="sm">
-                            <Link href={`/admin/requests/${request.id}`}>
+                            <Link href={`/admin/requests/${request._id}`}>
                                <Eye className="mr-2 h-4 w-4"/> View
                             </Link>
                          </Button>

@@ -1,0 +1,320 @@
+// Layout styles
+
+// Container
+.container {
+  @include container;
+}
+
+// Header
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  width: 100%;
+  border-bottom: 1px solid $border-color;
+  background-color: hsl(var(--background) / 0.95);
+  backdrop-filter: blur(8px);
+  
+  &__content {
+    @include container;
+    @include flex-between;
+    height: 4rem;
+  }
+  
+  &__logo {
+    @include flex-center;
+    gap: $spacing-sm;
+    text-decoration: none;
+    color: inherit;
+    
+    &:hover {
+      text-decoration: none;
+    }
+  }
+  
+  &__brand {
+    font-family: $font-headline;
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+  
+  &__nav {
+    display: none;
+    align-items: center;
+    gap: $spacing-lg;
+    font-size: 0.875rem;
+    font-weight: 500;
+    
+    @include responsive(md) {
+      display: flex;
+    }
+  }
+  
+  &__nav-link {
+    transition: color 0.2s ease-in-out;
+    color: $muted-foreground;
+    
+    &:hover {
+      color: $primary-color;
+    }
+    
+    &--active {
+      color: $primary-color;
+    }
+  }
+  
+  &__actions {
+    @include flex-center;
+    gap: $spacing-sm;
+  }
+  
+  &__mobile-menu {
+    display: block;
+    
+    @include responsive(md) {
+      display: none;
+    }
+  }
+  
+  &__mobile-nav {
+    display: none;
+    
+    @include responsive(md) {
+      display: none;
+    }
+    
+    &--open {
+      display: block;
+    }
+  }
+  
+  &__mobile-nav-content {
+    @include container;
+    @include flex-col;
+    align-items: flex-start;
+    gap: $spacing-md;
+    padding-bottom: $spacing-md;
+  }
+  
+  &__mobile-nav-links {
+    @include flex-col;
+    align-items: flex-start;
+    gap: $spacing-sm;
+    width: 100%;
+  }
+  
+  &__mobile-nav-link {
+    width: 100%;
+    border-radius: $radius-md;
+    padding: $spacing-sm $spacing-md;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+    color: $muted-foreground;
+    text-decoration: none;
+    
+    &:hover {
+      background-color: $accent-color;
+      color: $accent-foreground;
+    }
+    
+    &--active {
+      background-color: $accent-color;
+      color: $accent-foreground;
+    }
+  }
+}
+
+// Footer
+.footer {
+  border-top: 1px solid $border-color;
+  background-color: hsl(var(--background));
+  padding: $spacing-xl 0;
+  
+  &__content {
+    @include container;
+    @include flex-col;
+    gap: $spacing-lg;
+    
+    @include responsive(md) {
+      @include flex-between;
+      flex-direction: row;
+    }
+  }
+  
+  &__brand {
+    @include flex-center;
+    gap: $spacing-sm;
+    font-family: $font-headline;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: inherit;
+    text-decoration: none;
+  }
+  
+  &__nav {
+    @include flex-col;
+    gap: $spacing-sm;
+    
+    @include responsive(md) {
+      flex-direction: row;
+    }
+  }
+  
+  &__nav-link {
+    color: $muted-foreground;
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: color 0.2s ease-in-out;
+    
+    &:hover {
+      color: $foreground-color;
+    }
+  }
+  
+  &__copyright {
+    color: $muted-foreground;
+    font-size: 0.875rem;
+    text-align: center;
+    
+    @include responsive(md) {
+      text-align: right;
+    }
+  }
+}
+
+// Main content
+.main {
+  flex: 1;
+}
+
+// Page header
+.page-header {
+  @include container;
+  padding: $spacing-xl 0;
+  text-align: center;
+  
+  &__title {
+    font-size: 2.25rem;
+    font-weight: 700;
+    margin-bottom: $spacing-md;
+    
+    @include responsive(md) {
+      font-size: 3rem;
+    }
+  }
+  
+  &__description {
+    font-size: 1.125rem;
+    color: $muted-foreground;
+    max-width: 42rem;
+    margin: 0 auto;
+  }
+}
+
+// Grid layouts
+.grid {
+  display: grid;
+  gap: $spacing-lg;
+  
+  &--cols-1 {
+    grid-template-columns: 1fr;
+  }
+  
+  &--cols-2 {
+    grid-template-columns: 1fr;
+    
+    @include responsive(md) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  &--cols-3 {
+    grid-template-columns: 1fr;
+    
+    @include responsive(md) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
+  &--cols-4 {
+    grid-template-columns: 1fr;
+    
+    @include responsive(md) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    @include responsive(lg) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+}
+
+// Flex layouts
+.flex {
+  display: flex;
+  
+  &--col {
+    flex-direction: column;
+  }
+  
+  &--wrap {
+    flex-wrap: wrap;
+  }
+  
+  &--center {
+    @include flex-center;
+  }
+  
+  &--between {
+    @include flex-between;
+  }
+  
+  &--start {
+    align-items: flex-start;
+  }
+  
+  &--end {
+    align-items: flex-end;
+  }
+}
+
+// Spacing utilities
+.gap-xs { gap: $spacing-xs; }
+.gap-sm { gap: $spacing-sm; }
+.gap-md { gap: $spacing-md; }
+.gap-lg { gap: $spacing-lg; }
+.gap-xl { gap: $spacing-xl; }
+.gap-2xl { gap: $spacing-2xl; }
+.gap-3xl { gap: $spacing-3xl; }
+
+// Text alignment
+.text-left { text-align: left; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+
+// Display utilities
+.hidden { display: none; }
+.block { display: block; }
+.inline { display: inline; }
+.inline-block { display: inline-block; }
+
+@include responsive(sm) {
+  .sm\:hidden { display: none; }
+  .sm\:block { display: block; }
+  .sm\:flex { display: flex; }
+}
+
+@include responsive(md) {
+  .md\:hidden { display: none; }
+  .md\:block { display: block; }
+  .md\:flex { display: flex; }
+  .md\:grid { display: grid; }
+}
+
+@include responsive(lg) {
+  .lg\:hidden { display: none; }
+  .lg\:block { display: block; }
+  .lg\:flex { display: flex; }
+  .lg\:grid { display: grid; }
+}

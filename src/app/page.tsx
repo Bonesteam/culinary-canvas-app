@@ -98,7 +98,7 @@ export default function Home() {
       </section>
 
       <section id="features" className="py-16 md:py-24 bg-background">
-        <div className="container mx-auto px-4">
+        <div className="container">
           <div className="text-center max-w-3xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-headline font-bold">Two Paths to Delicious</h2>
             <p className="mt-4 text-lg text-muted-foreground">
@@ -127,7 +127,7 @@ export default function Home() {
       </section>
 
       <section className="py-16 md:py-24 bg-secondary/50">
-        <div className="container mx-auto px-4">
+        <div className="container">
           <div className="text-center max-w-3xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-headline font-bold">Cook with Confidence & Joy</h2>
             <p className="mt-4 text-lg text-muted-foreground">
@@ -162,7 +162,7 @@ export default function Home() {
       </section>
 
       <section id="faq" className="py-16 md:py-24 bg-background">
-        <div className="container mx-auto px-4">
+        <div className="container">
           <div className="text-center max-w-3xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-headline font-bold">Frequently Asked Questions</h2>
             <p className="mt-4 text-lg text-muted-foreground">
@@ -185,7 +185,7 @@ export default function Home() {
       </section>
 
       <section className="py-16 md:py-24 bg-secondary/50">
-        <div className="container mx-auto px-4 text-center">
+        <div className="container text-center">
             <h2 className="text-3xl md:text-4xl font-headline font-bold">Ready to Start Cooking?</h2>
             <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">Join Culinary Canvas today and unlock a world of flavor, tailored just for you.</p>
             <div className="mt-8">
