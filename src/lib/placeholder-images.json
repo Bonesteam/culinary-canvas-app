@@ -1,0 +1,40 @@
+{
+  "placeholderImages": [
+    {
+      "id": "hero-home",
+      "description": "A modern, bright kitchen with stainless steel appliances and a clean countertop.",
+      "imageUrl": "https://picsum.photos/seed/kitchen1/1920/1080",
+      "imageHint": "modern kitchen"
+    },
+    {
+      "id": "benefit-1",
+      "description": "Close-up of hands chopping fresh vegetables on a wooden cutting board.",
+      "imageUrl": "https://picsum.photos/seed/chopping/400/225",
+      "imageHint": "chopping vegetables"
+    },
+    {
+      "id": "benefit-2",
+      "description": "A colorful bowl of fresh salad with various greens, tomatoes, and cucumbers.",
+      "imageUrl": "https://picsum.photos/seed/freshsalad/400/225",
+      "imageHint": "fresh salad"
+    },
+    {
+      "id": "benefit-3",
+      "description": "A pot simmering on a stove, with steam rising from it.",
+      "imageUrl": "https://picsum.photos/seed/cookingpot/400/225",
+      "imageHint": "cooking pot"
+    },
+    {
+      "id": "chef-plan",
+      "description": "A professional chef meticulously garnishing a dish.",
+      "imageUrl": "https://picsum.photos/seed/chefplan/600/400",
+      "imageHint": "chef plating"
+    },
+    {
+      "id": "ai-plan",
+      "description": "Abstract futuristic image representing artificial intelligence and data streams.",
+      "imageUrl": "https://picsum.photos/seed/aiplan/600/400",
+      "imageHint": "abstract technology"
+    }
+  ]
+}
